@@ -1,0 +1,60 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.*
+
+# Python virtual environments and caches
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+
+# Build and test outputs
+dist/
+build/
+coverage/
+.cache/
+.parcel-cache/
+.vite/
+.next/
+.nuxt/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment and secrets
+.env
+.env.*
+*.pem
+*.key
+*.crt
+*.p12
+*.token
+*token*
+*secret*
+
+# IDE and local OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Trae/Electron application bundles accidentally mixed into source folders
+Trae.exe
+*.dll
+*.pak
+*.asar
+*.node
+*.exe
+locales/
+resources/
+bin/
+tools/
+debug.log
+

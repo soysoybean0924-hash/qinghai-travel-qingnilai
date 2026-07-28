@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>青海生态旅游行程规划</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active" data-page="home-page">首页</a>
+            <a href="#" class="nav-item" data-page="wellness-page">康养中心</a>
+            <a href="#" class="nav-item" data-page="treasures-page">宝藏铺</a>
+            <a href="#" class="nav-item" data-page="hotels-page">酒店预订</a>
+            <a href="#" class="nav-item" data-page="fun-page">旅趣营</a>
+            <a href="#" class="nav-item" data-page="me-page">我的</a>
+        </nav>
+    </header>
+    <div class="container">
+        <!-- 首页内容 -->
+        <div id="home-page" class="page-content">
+            <h1>青海生态旅游行程规划</h1>
+
+            <div class="main-content">
+                <div class="video-container">
+                <video controls width="100%">
+                    <!-- 实际项目中，这里应替换为真实的视频文件路径 -->
+                    <source src="videos/qinghai-intro.mp4" type="video/mp4">
+                    您的浏览器不支持视频播放。
+                </video>
+            </div>
+
+                <h2>热门景点</h2>
+                <div class="gallery-container" id="gallery-container">
+                    <!-- 景点照片将由 JavaScript 动态加载 -->
+                </div>
+            </div>
+
+            <div class="input-section">
+                <h2>您的专属行程规划师</h2>
+                <textarea id="itinerary-input" rows="5" placeholder="请告诉我您的旅行想法，比如：&#10;我60岁了，想去青海湖和茶卡盐湖，牙口不太好，喜欢吃软一点的东西，请帮我规划一下。"></textarea>
+                <button id="generate-btn">生成专属行程</button>
+            </div>
+            <div id="itinerary-output">
+                <!-- 行程建议将在这里显示 -->
+            </div>
+        </div>
+
+        <!-- 康养中心内容 (默认隐藏) -->
+        <div id="wellness-page" class="page-content" style="display: none;">
+            <h1>康养中心</h1>
+            <div class="search-bar-container">
+                <input type="text" id="wellness-search-input" placeholder="输入地点，如“海东”">
+                <button id="wellness-search-btn">搜索</button>
+            </div>
+
+            <div class="main-content">
+                <h2>康养推荐</h2>
+                <div id="wellness-results-container">
+                    <!-- 康养地点搜索结果将在这里显示 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 酒店预订内容 (默认隐藏) -->
+        <div id="hotels-page" class="page-content" style="display: none;">
+            <h1>酒店预订</h1>
+            <div class="filter-btn-group">
+                <button class="filter-btn active" data-category="all">全部</button>
+                <button class="filter-btn" data-category="连锁酒店">连锁酒店</button>
+                <button class="filter-btn" data-category="民宿">民宿</button>
+            </div>
+            <div class="search-bar-container">
+                <input type="text" id="hotels-search-input" placeholder="搜索酒店，如“全季”">
+            </div>
+            <div id="hotels-container" class="gallery-container">
+                <!-- 酒店将在这里显示 -->
+            </div>
+        </div>
+
+        <!-- 其他页面容器... -->
+        <div id="treasures-page" class="page-content" style="display: none;">
+            <h1>宝藏铺</h1>
+            <div class="filter-btn-group">
+                <button class="filter-btn active" data-category="all">全部</button>
+                <button class="filter-btn" data-category="农牧产品">农牧产品</button>
+                <button class="filter-btn" data-category="手工艺品">手工艺品</button>
+                <button class="filter-btn" data-category="饮品">饮品</button>
+                <button class="filter-btn" data-category="文创产品">文创产品</button>
+            </div>
+            <div class="search-bar-container">
+                <input type="text" id="treasures-search-input" placeholder="搜索产品，如“藏毯”">
+            </div>
+            <div id="treasures-container" class="gallery-container">
+                <!-- 产品将在这里显示 -->
+            </div>
+        </div>
+        <div id="fun-page" class="page-content" style="display: none;">
+            <h1>旅趣营</h1>
+            <div class="sub-nav-group">
+                <button class="sub-nav-btn active" data-target="plaza-content">广场</button>
+                <button class="sub-nav-btn" data-target="suggestion-box-content">意见箱</button>
+            </div>
+
+            <!-- 广场内容 -->
+            <div id="plaza-content" class="sub-page-content">
+                <!-- 广场帖子将在这里显示 -->
+            </div>
+
+            <!-- 意见箱内容 -->
+            <div id="suggestion-box-content" class="sub-page-content" style="display: none;">
+                <p>我们非常重视您的意见，请在此处填写您遇到的问题或建议，相关部门会及时处理。</p>
+                <textarea id="suggestion-textarea" class="post-textarea" rows="8" placeholder="请详细描述您的问题或建议..."></textarea>
+                <button id="submit-suggestion-btn" class="submit-btn">提交意见</button>
+            </div>
+
+            <!-- 发布按钮 -->
+            <div class="publish-btn-container">
+                <button id="publish-btn">发布</button>
+            </div>
+        </div>
+        <div id="me-page" class="page-content" style="display: none;">
+            <h1>我的</h1>
+            <div class="profile-preview">
+                <img src="images/avatar-me.jpg" alt="用户头像" class="profile-avatar">
+                <div class="profile-info">
+                    <h3>尊敬的用户</h3>
+                    <p>欢迎回来！</p>
+                </div>
+            </div>
+
+            <div class="me-section">
+                <h2>我的订单</h2>
+                <div id="orders-container">
+                    <!-- 订单将在这里显示 -->
+                </div>
+            </div>
+
+            <div class="me-section">
+                <h2>我的收藏</h2>
+                <div id="favorites-container" class="gallery-container">
+                    <!-- 收藏将在这里显示 -->
+                </div>
+            </div>
+
+            <div class="me-section">
+                <h2>更多选项</h2>
+                <div class="me-options-grid">
+                    <div class="me-option-card"><span>联系客服</span></div>
+                    <div class="me-option-card"><span>设置</span></div>
+                    <div class="me-option-card"><span>关于我们</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+
+    <!-- 景点详情弹窗 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <img id="modal-img" src="" alt="景点图片">
+            <h3 id="modal-title"></h3>
+            <p><strong>门票：</strong><span id="modal-ticket"></span></p>
+            <p id="modal-desc"></p>
+        </div>
+    </div>
+
+    <!-- 产品详情弹窗 -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content product-modal-content">
+            <span class="close-btn product-close-btn">&times;</span>
+            <img id="product-modal-img" src="" alt="产品图片">
+            <h3 id="product-modal-title"></h3>
+            <p><strong>类别：</strong><span id="product-modal-category"></span></p>
+            <p><strong>主要功能：</strong><span id="product-modal-function"></span></p>
+            <p><strong>规格：</strong><span id="product-modal-specs"></span></p>
+            <p><strong>详细介绍：</strong><span id="product-modal-description"></span></p>
+            <div id="product-options-container" style="display: none;">
+                <h4>选择规格：</h4>
+                <div id="product-options-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 支付弹窗 -->
+    <div id="pay-modal" class="modal">
+        <div class="modal-content pay-modal-content">
+            <span class="close-btn pay-close-btn">&times;</span>
+            <h3>选择支付方式</h3>
+            <div class="pay-options">
+                <div class="pay-option">
+                    <input type="radio" id="pay-bank" name="pay-method" value="bank" checked>
+                    <label for="pay-bank">银行卡支付</label>
+                </div>
+                <div class="pay-option">
+                    <input type="radio" id="pay-wechat" name="pay-method" value="wechat">
+                    <label for="pay-wechat">微信支付</label>
+                </div>
+                <div class="pay-option">
+                    <input type="radio" id="pay-alipay" name="pay-method" value="alipay">
+                    <label for="pay-alipay">支付宝支付</label>
+                </div>
+            </div>
+            <button id="confirm-pay-btn" class="book-btn">确认支付</button>
+        </div>
+    </div>
+
+    <!-- 酒店详情弹窗 -->
+    <div id="hotel-modal" class="modal">
+        <div class="modal-content product-modal-content">
+            <span class="close-btn hotel-close-btn">&times;</span>
+            <img id="hotel-modal-img" src="" alt="酒店图片">
+            <h3 id="hotel-modal-title"></h3>
+            <p><strong>类别：</strong><span id="hotel-modal-category"></span></p>
+            <p><strong>地址：</strong><span id="hotel-modal-address"></span></p>
+            <p><strong>详细介绍：</strong><span id="hotel-modal-description"></span></p>
+            <div id="hotel-rooms-container">
+                <h4>选择房型：</h4>
+                <div id="hotel-rooms-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 发布帖子弹窗 -->
+    <div id="post-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn post-close-btn">&times;</span>
+            <h3>分享你的旅途见闻</h3>
+            <textarea id="post-textarea" class="post-textarea" rows="8" placeholder="在这里写下你的新鲜事..."></textarea>
+            <button id="submit-post-btn" class="submit-btn">发布到广场</button>
+        </div>
+    </div>
+
+
+
+    <!-- 支付方式选择弹窗 -->
+    <div id="payment-method-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn payment-method-close-btn">&times;</span>
+            <h3>选择支付方式</h3>
+            <div class="payment-options">
+                <button id="card-payment-btn" class="payment-option-btn">银行卡支付</button>
+                <button id="qr-payment-btn" class="payment-option-btn">微信/支付宝</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 银行卡支付弹窗 -->
+    <div id="card-payment-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn card-payment-close-btn">&times;</span>
+            <h3>银行卡支付</h3>
+            <form id="card-payment-form" class="payment-form">
+                <input type="text" placeholder="持卡人姓名" required>
+                <input type="tel" placeholder="手机号" required>
+                <input type="text" placeholder="银行卡号" required>
+                <input type="text" placeholder="身份证号" required>
+                <div class="verification-code-group">
+                    <input type="text" placeholder="验证码" required>
+                    <button type="button" class="get-code-btn">获取验证码</button>
+                </div>
+                <button type="submit" class="submit-btn">确认支付</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 二维码支付弹窗 -->
+    <div id="qr-payment-modal" class="modal">
+        <div class="modal-content qr-modal-content">
+            <span class="close-btn qr-payment-close-btn">&times;</span>
+            <h3>微信/支付宝支付</h3>
+            <div id="qrcode-container" class="qrcode-container">
+                <div class="qrcode-placeholder" aria-label="支付二维码占位">
+                    <span>QR</span>
+                </div>
+            </div>
+            <p>请使用微信或支付宝扫码完成支付</p>
+        </div>
+    </div>
+</body>
+</html>
