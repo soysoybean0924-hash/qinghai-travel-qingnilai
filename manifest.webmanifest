@@ -1,0 +1,27 @@
+{
+  "name": "青海生态旅游行程规划",
+  "short_name": "青睐旅",
+  "description": "面向青海生态旅游、康养旅居和乡村特色产品展示的文旅服务应用。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "images/attraction-1.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/attraction-2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["travel", "lifestyle"],
+  "lang": "zh-CN"
+}

@@ -1629,6 +1629,23 @@ button:hover {
     background: #ffe5e1;
 }
 
+.install-action {
+    background: #eef8ff;
+    color: #0056b3;
+    border: 1px solid #b8dcff;
+}
+
+.install-action:hover {
+    background: #dff0ff;
+}
+
+.install-action:disabled {
+    color: #6c757d;
+    background: #f1f3f5;
+    border-color: #ced4da;
+    cursor: not-allowed;
+}
+
 /* 酒店卡片样式 */
 .hotel-recommendation {
     font-size: 14px;
@@ -1785,4 +1802,52 @@ button:hover {
 
 .add-room-btn:hover {
     background-color: #e55a2b;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding-bottom: 74px;
+    }
+
+    header {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        z-index: 1200;
+        padding: 0;
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+    }
+
+    .nav-menu {
+        justify-content: space-around;
+        background: #fff;
+    }
+
+    .nav-item {
+        flex: 1;
+        padding: 12px 6px;
+        font-size: 14px;
+        text-align: center;
+        border-bottom: none;
+        border-top: 3px solid transparent;
+    }
+
+    .nav-item.active,
+    .nav-item:hover {
+        border-bottom-color: transparent;
+        border-top-color: #007bff;
+    }
+
+    .container {
+        margin: 0 auto;
+        padding: 18px;
+        border-radius: 0;
+    }
+
+    .publish-btn-container {
+        bottom: 88px;
+        right: 18px;
+    }
 }

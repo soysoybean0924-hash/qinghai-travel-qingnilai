@@ -202,6 +202,8 @@ POST /api/feedback
 
 ## 8. 阶段六：移动端体验和 PWA
 
+当前进度：已添加 `manifest.webmanifest`、`sw.js`、Service Worker 注册、安装到桌面按钮、移动端底部导航和基础离线缓存。下一步可继续补充更标准的应用图标、离线页、缓存版本提示和 Capacitor 打包配置。
+
 ### 目标
 
 先让 Web 应用具备接近 App 的移动体验。

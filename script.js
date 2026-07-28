@@ -1,4 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
+    let deferredInstallPrompt = null;
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(error => {
+            console.warn('Service Worker 注册失败:', error);
+        });
+    }
+
+    window.addEventListener('beforeinstallprompt', event => {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+        const installBtn = document.getElementById('install-app-btn');
+        if (installBtn) {
+            installBtn.disabled = false;
+            installBtn.textContent = '安装到桌面';
+        }
+    });
+
+    window.addEventListener('appinstalled', () => {
+        deferredInstallPrompt = null;
+        const installBtn = document.getElementById('install-app-btn');
+        if (installBtn) {
+            installBtn.textContent = '已安装';
+            installBtn.disabled = true;
+        }
+    });
+
     // 示例景点数据
     const attractionsData = [
         {
@@ -1809,6 +1836,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const favoritesContainer = document.getElementById('favorites-container');
     const feedbackContainer = document.getElementById('feedback-container');
     const resetLocalDataBtn = document.getElementById('reset-local-data-btn');
+    const installAppBtn = document.getElementById('install-app-btn');
     const orderFilterGroup = document.getElementById('order-filter-group');
     const clearFeedbackBtn = document.getElementById('clear-feedback-btn');
     let currentOrderFilter = 'all';
@@ -1930,6 +1958,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (resetLocalDataBtn) {
         resetLocalDataBtn.addEventListener('click', resetLocalData);
+    }
+
+    if (installAppBtn) {
+        installAppBtn.addEventListener('click', async () => {
+            if (!deferredInstallPrompt) {
+                alert('当前浏览器暂未提供安装入口。您可以使用浏览器菜单中的“添加到主屏幕”或“安装应用”。');
+                return;
+            }
+
+            deferredInstallPrompt.prompt();
+            await deferredInstallPrompt.userChoice;
+            deferredInstallPrompt = null;
+        });
     }
 
     if (clearFeedbackBtn) {
