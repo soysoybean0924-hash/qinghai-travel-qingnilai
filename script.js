@@ -997,6 +997,42 @@ document.addEventListener('DOMContentLoaded', () => {
         { type: 'product', id: 2 }      // 对应 treasuresData 中的高原牦牛肉干
     ];
 
+    const STORAGE_KEYS = {
+        orders: 'qingnilai.orders',
+        favorites: 'qingnilai.favorites',
+        plaza: 'qingnilai.plaza',
+        feedback: 'qingnilai.feedback'
+    };
+
+    function loadStoredArray(key, fallback) {
+        try {
+            const value = localStorage.getItem(key);
+            if (!value) return fallback;
+            const parsed = JSON.parse(value);
+            return Array.isArray(parsed) ? parsed : fallback;
+        } catch (error) {
+            console.warn('读取本地数据失败:', key, error);
+            return fallback;
+        }
+    }
+
+    function saveStoredArray(key, data) {
+        try {
+            localStorage.setItem(key, JSON.stringify(data));
+        } catch (error) {
+            console.warn('保存本地数据失败:', key, error);
+        }
+    }
+
+    function replaceArray(target, source) {
+        target.splice(0, target.length, ...source);
+    }
+
+    replaceArray(plazaData, loadStoredArray(STORAGE_KEYS.plaza, plazaData));
+    replaceArray(ordersData, loadStoredArray(STORAGE_KEYS.orders, ordersData));
+    replaceArray(favoritesData, loadStoredArray(STORAGE_KEYS.favorites, favoritesData));
+    const feedbackData = loadStoredArray(STORAGE_KEYS.feedback, []);
+
     const galleryContainer = document.getElementById('gallery-container');
 
     function populateGallery() {
@@ -1108,6 +1144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         ordersData.unshift(newOrder);
+        saveStoredArray(STORAGE_KEYS.orders, ordersData);
         renderOrders();
     }
 
@@ -1273,6 +1310,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         ordersData.unshift(newOrder);
+        saveStoredArray(STORAGE_KEYS.orders, ordersData);
         renderOrders();
     }
 
@@ -1406,6 +1444,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         ordersData.unshift(orderItem);
+        saveStoredArray(STORAGE_KEYS.orders, ordersData);
         renderOrders();
         alert('已成功加入订单！');
     }
@@ -1596,6 +1635,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 添加到订单数据
             ordersData.unshift(orderItem); // 添加到数组开头，显示最新订单
+            saveStoredArray(STORAGE_KEYS.orders, ordersData);
             
             // 重新渲染订单
             renderOrders();
@@ -1627,6 +1667,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 添加到订单数据
             ordersData.unshift(orderItem);
+            saveStoredArray(STORAGE_KEYS.orders, ordersData);
             
             // 重新渲染订单
             renderOrders();
@@ -1708,6 +1749,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderPlazaPosts() {
         plazaContent.innerHTML = '';
+        if (plazaData.length === 0) {
+            plazaContent.innerHTML = '<p class="empty-state">还没有帖子，快来分享你的青海旅行见闻吧。</p>';
+            return;
+        }
         // 只显示前5个评论
         plazaData.slice(0, 5).forEach(post => {
             const postEl = document.createElement('div');
@@ -1750,6 +1795,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderOrders() {
         ordersContainer.innerHTML = '';
+        if (ordersData.length === 0) {
+            ordersContainer.innerHTML = '<p class="empty-state">暂无订单。</p>';
+            return;
+        }
         ordersData.forEach(order => {
             const orderEl = document.createElement('div');
             orderEl.className = 'order-item-new';
@@ -1860,6 +1909,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const index = ordersData.findIndex(order => order.orderId === orderId);
             if (index !== -1) {
                 ordersData.splice(index, 1);
+                saveStoredArray(STORAGE_KEYS.orders, ordersData);
                 renderOrders();
             }
         }
@@ -1914,6 +1964,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderFavorites() {
         favoritesContainer.innerHTML = '';
+        if (favoritesData.length === 0) {
+            favoritesContainer.innerHTML = '<p class="empty-state">暂无收藏。</p>';
+            return;
+        }
         favoritesData.forEach(fav => {
             let itemData = null;
             if (fav.type === 'attraction') {
@@ -1995,12 +2049,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (existingIndex !== -1) {
             // 已收藏，取消收藏
             favoritesData.splice(existingIndex, 1);
+            saveStoredArray(STORAGE_KEYS.favorites, favoritesData);
             btn.classList.remove('favorited');
             btn.textContent = '☆';
             alert('已取消收藏');
         } else {
             // 未收藏，添加收藏
             favoritesData.push({ type, id });
+            saveStoredArray(STORAGE_KEYS.favorites, favoritesData);
             btn.classList.add('favorited');
             btn.textContent = '★';
             alert('已添加到收藏');
@@ -2015,6 +2071,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const index = favoritesData.findIndex(fav => fav.type === type && fav.id === id);
         if (index !== -1) {
             favoritesData.splice(index, 1);
+            saveStoredArray(STORAGE_KEYS.favorites, favoritesData);
             renderFavorites();
             alert('已取消收藏');
         }
@@ -2055,6 +2112,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 timestamp: '刚刚'
             };
             plazaData.unshift(newPost); // 将新帖子添加到最前面
+            saveStoredArray(STORAGE_KEYS.plaza, plazaData);
             renderPlazaPosts();
             postTextarea.value = '';
             closePostModal();
@@ -2068,6 +2126,12 @@ document.addEventListener('DOMContentLoaded', () => {
     submitSuggestionBtn.addEventListener('click', () => {
         const suggestion = suggestionTextarea.value.trim();
         if (suggestion) {
+            feedbackData.unshift({
+                id: Date.now(),
+                content: suggestion,
+                timestamp: new Date().toLocaleString('zh-CN')
+            });
+            saveStoredArray(STORAGE_KEYS.feedback, feedbackData);
             alert('您的宝贵意见已成功提交，感谢您的反馈！');
             suggestionTextarea.value = '';
         } else {
