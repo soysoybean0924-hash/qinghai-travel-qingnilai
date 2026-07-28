@@ -1028,6 +1028,10 @@ document.addEventListener('DOMContentLoaded', () => {
         target.splice(0, target.length, ...source);
     }
 
+    const initialPlazaData = JSON.parse(JSON.stringify(plazaData));
+    const initialOrdersData = JSON.parse(JSON.stringify(ordersData));
+    const initialFavoritesData = JSON.parse(JSON.stringify(favoritesData));
+
     replaceArray(plazaData, loadStoredArray(STORAGE_KEYS.plaza, plazaData));
     replaceArray(ordersData, loadStoredArray(STORAGE_KEYS.orders, ordersData));
     replaceArray(favoritesData, loadStoredArray(STORAGE_KEYS.favorites, favoritesData));
@@ -1135,6 +1139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const newOrder = {
             orderId: Date.now().toString(),
             timestamp: new Date().toLocaleString('zh-CN'),
+            status: 'pending',
             type: '景点',
             attractionName: attractionItem.name,
             optionName: option.name,
@@ -1146,6 +1151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ordersData.unshift(newOrder);
         saveStoredArray(STORAGE_KEYS.orders, ordersData);
         renderOrders();
+        renderMeDashboard();
     }
 
     // 景点点击事件 (事件委托)
@@ -1301,6 +1307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const newOrder = {
             orderId: Date.now().toString(),
             timestamp: new Date().toLocaleString('zh-CN'),
+            status: 'pending',
             type: '康养中心',
             wellnessName: wellnessItem.name,
             roomName: room.name,
@@ -1312,6 +1319,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ordersData.unshift(newOrder);
         saveStoredArray(STORAGE_KEYS.orders, ordersData);
         renderOrders();
+        renderMeDashboard();
     }
 
     // 支付流程
@@ -1435,6 +1443,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const orderItem = {
             orderId: Date.now().toString(),
             type: '酒店预订',
+            status: 'pending',
             hotelName: hotel.name,
             roomName: room.name,
             roomPrice: room.price,
@@ -1446,6 +1455,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ordersData.unshift(orderItem);
         saveStoredArray(STORAGE_KEYS.orders, ordersData);
         renderOrders();
+        renderMeDashboard();
         alert('已成功加入订单！');
     }
 
@@ -1623,6 +1633,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const orderItem = {
                 orderId: Date.now().toString(),
                 type: '宝藏铺',
+                status: 'pending',
                 items: [{
                     id: product.id,
                     name: product.name,
@@ -1639,6 +1650,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 重新渲染订单
             renderOrders();
+            renderMeDashboard();
             
             // 显示加入成功弹框
             showSuccessModal('已成功添加到订单！');
@@ -1653,6 +1665,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const orderItem = {
                 orderId: Date.now().toString(),
                 type: '宝藏铺',
+                status: 'pending',
                 items: [{
                     id: product.id,
                     name: product.name,
@@ -1671,6 +1684,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 重新渲染订单
             renderOrders();
+            renderMeDashboard();
             
             // 显示加入成功弹框
             showSuccessModal('已成功添加到订单！');
@@ -1790,8 +1804,95 @@ document.addEventListener('DOMContentLoaded', () => {
     renderPlazaPosts();
 
     // “我的”页面功能
+    const meDashboard = document.getElementById('me-dashboard');
     const ordersContainer = document.getElementById('orders-container');
     const favoritesContainer = document.getElementById('favorites-container');
+    const feedbackContainer = document.getElementById('feedback-container');
+    const resetLocalDataBtn = document.getElementById('reset-local-data-btn');
+
+    function getOrderStatus(order) {
+        return order.status || 'pending';
+    }
+
+    function getOrderStatusText(order) {
+        return getOrderStatus(order) === 'paid' ? '已支付' : '待支付';
+    }
+
+    function renderMeDashboard() {
+        if (!meDashboard) return;
+
+        const paidOrders = ordersData.filter(order => getOrderStatus(order) === 'paid').length;
+        const pendingOrders = ordersData.length - paidOrders;
+
+        meDashboard.innerHTML = `
+            <div class="dashboard-card">
+                <span class="dashboard-number">${ordersData.length}</span>
+                <span class="dashboard-label">订单总数</span>
+            </div>
+            <div class="dashboard-card">
+                <span class="dashboard-number">${pendingOrders}</span>
+                <span class="dashboard-label">待支付</span>
+            </div>
+            <div class="dashboard-card">
+                <span class="dashboard-number">${paidOrders}</span>
+                <span class="dashboard-label">已支付</span>
+            </div>
+            <div class="dashboard-card">
+                <span class="dashboard-number">${favoritesData.length}</span>
+                <span class="dashboard-label">收藏</span>
+            </div>
+            <div class="dashboard-card">
+                <span class="dashboard-number">${plazaData.length}</span>
+                <span class="dashboard-label">旅趣帖</span>
+            </div>
+            <div class="dashboard-card">
+                <span class="dashboard-number">${feedbackData.length}</span>
+                <span class="dashboard-label">反馈</span>
+            </div>
+        `;
+    }
+
+    function renderFeedbacks() {
+        if (!feedbackContainer) return;
+
+        feedbackContainer.innerHTML = '';
+        if (feedbackData.length === 0) {
+            feedbackContainer.innerHTML = '<p class="empty-state">暂无反馈记录。</p>';
+            return;
+        }
+
+        feedbackData.slice(0, 5).forEach(item => {
+            const feedbackEl = document.createElement('div');
+            feedbackEl.className = 'feedback-item';
+            feedbackEl.innerHTML = `
+                <div class="feedback-header">
+                    <strong>反馈 #${item.id}</strong>
+                    <span>${item.timestamp}</span>
+                </div>
+                <p>${item.content}</p>
+            `;
+            feedbackContainer.appendChild(feedbackEl);
+        });
+    }
+
+    function resetLocalData() {
+        if (!confirm('确定要清除本地订单、收藏、帖子和反馈并恢复示例数据吗？')) {
+            return;
+        }
+
+        Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
+        replaceArray(plazaData, JSON.parse(JSON.stringify(initialPlazaData)));
+        replaceArray(ordersData, JSON.parse(JSON.stringify(initialOrdersData)));
+        replaceArray(favoritesData, JSON.parse(JSON.stringify(initialFavoritesData)));
+        replaceArray(feedbackData, []);
+        renderPlazaPosts();
+        renderMyPage();
+        alert('本地演示数据已重置。');
+    }
+
+    if (resetLocalDataBtn) {
+        resetLocalDataBtn.addEventListener('click', resetLocalData);
+    }
 
     function renderOrders() {
         ordersContainer.innerHTML = '';
@@ -1874,6 +1975,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="order-header">
                     <span>订单号：${order.orderId}</span>
                     <span class="order-timestamp">下单时间：${order.timestamp}</span>
+                    <span class="order-status ${getOrderStatus(order)}">${getOrderStatusText(order)}</span>
                     <button class="delete-order-btn" data-order-id="${order.orderId}">删除</button>
                 </div>
                 <div class="order-body">
@@ -1881,7 +1983,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="order-footer">
                     <span>合计：<span class="total-price">${order.total || order.roomPrice || order.optionPrice}</span></span>
-                    <button class="pay-order-btn" data-order-id="${order.orderId}">去支付</button>
+                    <button class="pay-order-btn" data-order-id="${order.orderId}" ${getOrderStatus(order) === 'paid' ? 'disabled' : ''}>
+                        ${getOrderStatus(order) === 'paid' ? '已支付' : '去支付'}
+                    </button>
                 </div>
             `;
             ordersContainer.appendChild(orderEl);
@@ -1911,6 +2015,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ordersData.splice(index, 1);
                 saveStoredArray(STORAGE_KEYS.orders, ordersData);
                 renderOrders();
+                renderMeDashboard();
             }
         }
     }
@@ -1929,8 +2034,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function confirmPayment() {
         if (currentPayOrderId) {
-            // 这里可以添加支付逻辑
-            alert('支付成功！');
+            const order = ordersData.find(item => item.orderId === currentPayOrderId);
+            if (order) {
+                order.status = 'paid';
+                order.paidAt = new Date().toLocaleString('zh-CN');
+                saveStoredArray(STORAGE_KEYS.orders, ordersData);
+                renderOrders();
+                renderMeDashboard();
+            }
+            alert('支付成功，订单状态已更新为已支付！');
             closePayModal();
         }
     }
@@ -2064,6 +2176,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 重新渲染收藏列表
         renderFavorites();
+        renderMeDashboard();
     }
 
     // 取消收藏
@@ -2073,13 +2186,16 @@ document.addEventListener('DOMContentLoaded', () => {
             favoritesData.splice(index, 1);
             saveStoredArray(STORAGE_KEYS.favorites, favoritesData);
             renderFavorites();
+            renderMeDashboard();
             alert('已取消收藏');
         }
     }
 
     function renderMyPage() {
+        renderMeDashboard();
         renderOrders();
         renderFavorites();
+        renderFeedbacks();
     }
 
     // 发布功能
@@ -2114,6 +2230,7 @@ document.addEventListener('DOMContentLoaded', () => {
             plazaData.unshift(newPost); // 将新帖子添加到最前面
             saveStoredArray(STORAGE_KEYS.plaza, plazaData);
             renderPlazaPosts();
+            renderMeDashboard();
             postTextarea.value = '';
             closePostModal();
             // 切换回广场视图
@@ -2132,6 +2249,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 timestamp: new Date().toLocaleString('zh-CN')
             });
             saveStoredArray(STORAGE_KEYS.feedback, feedbackData);
+            renderFeedbacks();
+            renderMeDashboard();
             alert('您的宝贵意见已成功提交，感谢您的反馈！');
             suggestionTextarea.value = '';
         } else {
