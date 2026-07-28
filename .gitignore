@@ -46,6 +46,7 @@ Thumbs.db
 desktop.ini
 
 # Trae/Electron application bundles accidentally mixed into source folders
+Trae/
 Trae.exe
 *.dll
 *.pak
