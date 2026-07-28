@@ -136,6 +136,11 @@
 
             <div class="me-section">
                 <h2>我的订单</h2>
+                <div class="order-filter-group" id="order-filter-group">
+                    <button class="order-filter-btn active" data-status="all" type="button">全部</button>
+                    <button class="order-filter-btn" data-status="pending" type="button">待支付</button>
+                    <button class="order-filter-btn" data-status="paid" type="button">已支付</button>
+                </div>
                 <div id="orders-container">
                     <!-- 订单将在这里显示 -->
                 </div>
@@ -149,7 +154,10 @@
             </div>
 
             <div class="me-section">
-                <h2>我的反馈</h2>
+                <div class="section-title-row">
+                    <h2>我的反馈</h2>
+                    <button id="clear-feedback-btn" class="small-danger-btn" type="button">清空反馈</button>
+                </div>
                 <div id="feedback-container">
                     <!-- 意见反馈将在这里显示 -->
                 </div>

@@ -1809,6 +1809,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const favoritesContainer = document.getElementById('favorites-container');
     const feedbackContainer = document.getElementById('feedback-container');
     const resetLocalDataBtn = document.getElementById('reset-local-data-btn');
+    const orderFilterGroup = document.getElementById('order-filter-group');
+    const clearFeedbackBtn = document.getElementById('clear-feedback-btn');
+    let currentOrderFilter = 'all';
 
     function getOrderStatus(order) {
         return order.status || 'pending';
@@ -1816,6 +1819,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function getOrderStatusText(order) {
         return getOrderStatus(order) === 'paid' ? '已支付' : '待支付';
+    }
+
+    function getFilteredOrders() {
+        if (currentOrderFilter === 'all') return ordersData;
+        return ordersData.filter(order => getOrderStatus(order) === currentOrderFilter);
     }
 
     function renderMeDashboard() {
@@ -1870,9 +1878,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span>${item.timestamp}</span>
                 </div>
                 <p>${item.content}</p>
+                <button class="delete-feedback-btn" data-feedback-id="${item.id}" type="button">删除反馈</button>
             `;
             feedbackContainer.appendChild(feedbackEl);
         });
+
+        document.querySelectorAll('.delete-feedback-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                deleteFeedback(e.target.dataset.feedbackId);
+            });
+        });
+    }
+
+    function deleteFeedback(feedbackId) {
+        if (!confirm('确定要删除这条反馈吗？')) return;
+        const index = feedbackData.findIndex(item => String(item.id) === String(feedbackId));
+        if (index !== -1) {
+            feedbackData.splice(index, 1);
+            saveStoredArray(STORAGE_KEYS.feedback, feedbackData);
+            renderFeedbacks();
+            renderMeDashboard();
+        }
+    }
+
+    function clearFeedbacks() {
+        if (feedbackData.length === 0) {
+            alert('当前没有反馈记录。');
+            return;
+        }
+        if (!confirm('确定要清空全部反馈记录吗？')) return;
+        replaceArray(feedbackData, []);
+        saveStoredArray(STORAGE_KEYS.feedback, feedbackData);
+        renderFeedbacks();
+        renderMeDashboard();
     }
 
     function resetLocalData() {
@@ -1894,13 +1932,33 @@ document.addEventListener('DOMContentLoaded', () => {
         resetLocalDataBtn.addEventListener('click', resetLocalData);
     }
 
+    if (clearFeedbackBtn) {
+        clearFeedbackBtn.addEventListener('click', clearFeedbacks);
+    }
+
+    if (orderFilterGroup) {
+        orderFilterGroup.addEventListener('click', (e) => {
+            const btn = e.target.closest('.order-filter-btn');
+            if (!btn) return;
+            currentOrderFilter = btn.dataset.status;
+            orderFilterGroup.querySelectorAll('.order-filter-btn').forEach(item => item.classList.remove('active'));
+            btn.classList.add('active');
+            renderOrders();
+        });
+    }
+
     function renderOrders() {
         ordersContainer.innerHTML = '';
+        const visibleOrders = getFilteredOrders();
         if (ordersData.length === 0) {
             ordersContainer.innerHTML = '<p class="empty-state">暂无订单。</p>';
             return;
         }
-        ordersData.forEach(order => {
+        if (visibleOrders.length === 0) {
+            ordersContainer.innerHTML = '<p class="empty-state">当前筛选下暂无订单。</p>';
+            return;
+        }
+        visibleOrders.forEach(order => {
             const orderEl = document.createElement('div');
             orderEl.className = 'order-item-new';
             

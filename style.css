@@ -1205,6 +1205,42 @@ h1 {
     border-bottom: 1px solid #eee;
 }
 
+.section-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.section-title-row h2 {
+    flex: 1;
+}
+
+.order-filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.order-filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #ccd8e6;
+    background: #fff;
+    color: #3d4a5c;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.order-filter-btn.active,
+.order-filter-btn:hover {
+    color: #fff;
+    background: #007bff;
+    border-color: #007bff;
+}
+
 .order-item {
     display: flex;
     align-items: center;
@@ -1555,6 +1591,32 @@ button:hover {
     margin: 0;
     color: #333;
     line-height: 1.7;
+}
+
+.delete-feedback-btn,
+.small-danger-btn {
+    border: 1px solid #f3b4ad;
+    background: #fff5f5;
+    color: #b42318;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.delete-feedback-btn {
+    margin-top: 12px;
+    padding: 8px 12px;
+}
+
+.small-danger-btn {
+    padding: 8px 12px;
+    white-space: nowrap;
+}
+
+.delete-feedback-btn:hover,
+.small-danger-btn:hover {
+    background: #ffe5e1;
 }
 
 .danger-action {
