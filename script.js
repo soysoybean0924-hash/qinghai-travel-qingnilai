@@ -1028,7 +1028,8 @@ document.addEventListener('DOMContentLoaded', () => {
         orders: 'qingnilai.orders',
         favorites: 'qingnilai.favorites',
         plaza: 'qingnilai.plaza',
-        feedback: 'qingnilai.feedback'
+        feedback: 'qingnilai.feedback',
+        savedTrips: 'qingnilai.savedTrips'
     };
 
     function loadStoredArray(key, fallback) {
@@ -1055,14 +1056,26 @@ document.addEventListener('DOMContentLoaded', () => {
         target.splice(0, target.length, ...source);
     }
 
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, char => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[char]));
+    }
+
     const initialPlazaData = JSON.parse(JSON.stringify(plazaData));
     const initialOrdersData = JSON.parse(JSON.stringify(ordersData));
     const initialFavoritesData = JSON.parse(JSON.stringify(favoritesData));
+    const initialSavedTripsData = [];
 
     replaceArray(plazaData, loadStoredArray(STORAGE_KEYS.plaza, plazaData));
     replaceArray(ordersData, loadStoredArray(STORAGE_KEYS.orders, ordersData));
     replaceArray(favoritesData, loadStoredArray(STORAGE_KEYS.favorites, favoritesData));
     const feedbackData = loadStoredArray(STORAGE_KEYS.feedback, []);
+    const savedTripsData = loadStoredArray(STORAGE_KEYS.savedTrips, initialSavedTripsData);
 
     const galleryContainer = document.getElementById('gallery-container');
 
@@ -1833,12 +1846,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // “我的”页面功能
     const meDashboard = document.getElementById('me-dashboard');
     const ordersContainer = document.getElementById('orders-container');
+    const savedTripsContainer = document.getElementById('saved-trips-container');
     const favoritesContainer = document.getElementById('favorites-container');
     const feedbackContainer = document.getElementById('feedback-container');
     const resetLocalDataBtn = document.getElementById('reset-local-data-btn');
     const installAppBtn = document.getElementById('install-app-btn');
     const orderFilterGroup = document.getElementById('order-filter-group');
     const clearFeedbackBtn = document.getElementById('clear-feedback-btn');
+    const clearTripsBtn = document.getElementById('clear-trips-btn');
     let currentOrderFilter = 'all';
 
     function getOrderStatus(order) {
@@ -1878,6 +1893,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="dashboard-label">收藏</span>
             </div>
             <div class="dashboard-card">
+                <span class="dashboard-number">${savedTripsData.length}</span>
+                <span class="dashboard-label">行程</span>
+            </div>
+            <div class="dashboard-card">
                 <span class="dashboard-number">${plazaData.length}</span>
                 <span class="dashboard-label">旅趣帖</span>
             </div>
@@ -1886,6 +1905,76 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="dashboard-label">反馈</span>
             </div>
         `;
+    }
+
+    function renderSavedTrips() {
+        if (!savedTripsContainer) return;
+
+        savedTripsContainer.innerHTML = '';
+        if (savedTripsData.length === 0) {
+            savedTripsContainer.innerHTML = '<p class="empty-state">暂无保存行程。您可以在首页生成专属行程后保存到这里。</p>';
+            return;
+        }
+
+        savedTripsData.forEach(trip => {
+            const tripEl = document.createElement('div');
+            tripEl.className = 'saved-trip-item';
+            tripEl.innerHTML = `
+                <div class="saved-trip-header">
+                    <div>
+                        <h3>${escapeHtml(trip.title)}</h3>
+                        <p>${escapeHtml(trip.createdAt)}</p>
+                    </div>
+                    <button class="delete-trip-btn" data-trip-id="${trip.id}" type="button">删除</button>
+                </div>
+                <p class="saved-trip-request">${escapeHtml(trip.request)}</p>
+                <div class="saved-trip-summary">${escapeHtml(trip.summary)}</div>
+            `;
+            savedTripsContainer.appendChild(tripEl);
+        });
+
+        document.querySelectorAll('.delete-trip-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                deleteSavedTrip(e.target.dataset.tripId);
+            });
+        });
+    }
+
+    function deleteSavedTrip(tripId) {
+        if (!confirm('确定要删除这个保存行程吗？')) return;
+        const index = savedTripsData.findIndex(item => String(item.id) === String(tripId));
+        if (index !== -1) {
+            savedTripsData.splice(index, 1);
+            saveStoredArray(STORAGE_KEYS.savedTrips, savedTripsData);
+            renderSavedTrips();
+            renderMeDashboard();
+        }
+    }
+
+    function clearSavedTrips() {
+        if (savedTripsData.length === 0) {
+            alert('当前没有保存行程。');
+            return;
+        }
+        if (!confirm('确定要清空全部保存行程吗？')) return;
+        replaceArray(savedTripsData, []);
+        saveStoredArray(STORAGE_KEYS.savedTrips, savedTripsData);
+        renderSavedTrips();
+        renderMeDashboard();
+    }
+
+    function saveGeneratedTrip(trip) {
+        const exists = savedTripsData.some(item => item.id === trip.id);
+        if (exists) {
+            alert('这个行程已经保存过了。');
+            return;
+        }
+
+        savedTripsData.unshift(trip);
+        saveStoredArray(STORAGE_KEYS.savedTrips, savedTripsData);
+        renderSavedTrips();
+        renderMeDashboard();
+        alert('行程已保存到“我的行程”。');
     }
 
     function renderFeedbacks() {
@@ -1950,6 +2039,7 @@ document.addEventListener('DOMContentLoaded', () => {
         replaceArray(plazaData, JSON.parse(JSON.stringify(initialPlazaData)));
         replaceArray(ordersData, JSON.parse(JSON.stringify(initialOrdersData)));
         replaceArray(favoritesData, JSON.parse(JSON.stringify(initialFavoritesData)));
+        replaceArray(savedTripsData, JSON.parse(JSON.stringify(initialSavedTripsData)));
         replaceArray(feedbackData, []);
         renderPlazaPosts();
         renderMyPage();
@@ -1975,6 +2065,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (clearFeedbackBtn) {
         clearFeedbackBtn.addEventListener('click', clearFeedbacks);
+    }
+
+    if (clearTripsBtn) {
+        clearTripsBtn.addEventListener('click', clearSavedTrips);
     }
 
     if (orderFilterGroup) {
@@ -2293,6 +2387,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderMyPage() {
         renderMeDashboard();
         renderOrders();
+        renderSavedTrips();
         renderFavorites();
         renderFeedbacks();
     }
@@ -2456,11 +2551,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const generateBtn = document.getElementById('generate-btn');
     const itineraryInput = document.getElementById('itinerary-input');
     const itineraryOutput = document.getElementById('itinerary-output');
+    let currentGeneratedTrip = null;
 
     generateBtn.addEventListener('click', () => {
         const inputText = itineraryInput.value;
 
         if (!inputText.trim()) {
+            currentGeneratedTrip = null;
             itineraryOutput.innerHTML = '<p>请输入您的旅行想法，我们才能为您量身定制哦。</p>';
             return;
         }
@@ -2520,7 +2617,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Part 4: 结尾
         html += `<p class="footer-note">祝您在青海有一段愉快而难忘的旅程！</p>`;
+        html += `<div class="itinerary-actions">
+                    <button class="save-itinerary-btn" type="button">保存到我的行程</button>
+                 </div>`;
+
+        const tripTitle = wantedAttractions.length > 0
+            ? `${wantedAttractions.map(item => item.name).join('、')}专属行程`
+            : '青海生态旅游专属行程';
+
+        const tripSummary = [
+            isElderly ? '已加入高原慢游与健康提醒' : '已生成基础出行建议',
+            prefersSoftFood ? '已匹配软糯口感美食' : '已推荐本地特色美食',
+            wantedAttractions.length > 0 ? `包含${wantedAttractions.length}个指定景点` : '包含默认热门景点建议'
+        ].join(' · ');
+
+        currentGeneratedTrip = {
+            id: Date.now(),
+            title: tripTitle,
+            request: inputText.trim(),
+            summary: tripSummary,
+            contentHtml: html,
+            createdAt: new Date().toLocaleString('zh-CN')
+        };
 
         itineraryOutput.innerHTML = html;
+    });
+
+    itineraryOutput.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('save-itinerary-btn')) return;
+        if (!currentGeneratedTrip) {
+            alert('请先生成行程后再保存。');
+            return;
+        }
+        saveGeneratedTrip(currentGeneratedTrip);
     });
 });

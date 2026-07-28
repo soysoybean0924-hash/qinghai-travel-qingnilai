@@ -1804,6 +1804,83 @@ button:hover {
     background-color: #e55a2b;
 }
 
+.itinerary-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 18px;
+}
+
+.save-itinerary-btn {
+    border: none;
+    border-radius: 6px;
+    background: #007bff;
+    color: #fff;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 11px 18px;
+}
+
+.save-itinerary-btn:hover {
+    background: #0056b3;
+}
+
+.saved-trip-item {
+    border: 1px solid #e1e7ef;
+    border-radius: 8px;
+    background: #fff;
+    margin-bottom: 14px;
+    padding: 16px;
+}
+
+.saved-trip-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.saved-trip-header h3 {
+    color: #1f2d3d;
+    font-size: 18px;
+    margin: 0 0 6px;
+}
+
+.saved-trip-header p {
+    color: #7a8794;
+    font-size: 13px;
+    margin: 0;
+}
+
+.saved-trip-request {
+    background: #f6f8fb;
+    border-left: 3px solid #007bff;
+    color: #4f5b67;
+    line-height: 1.7;
+    margin: 14px 0;
+    padding: 10px 12px;
+}
+
+.saved-trip-summary {
+    color: #324152;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.delete-trip-btn {
+    background: #fff;
+    border: 1px solid #ff6b6b;
+    border-radius: 4px;
+    color: #d64545;
+    cursor: pointer;
+    flex: 0 0 auto;
+    padding: 8px 12px;
+}
+
+.delete-trip-btn:hover {
+    background: #fff1f1;
+}
+
 @media (max-width: 768px) {
     body {
         padding-bottom: 74px;
@@ -1849,5 +1926,17 @@ button:hover {
     .publish-btn-container {
         bottom: 88px;
         right: 18px;
+    }
+
+    .itinerary-actions {
+        justify-content: stretch;
+    }
+
+    .save-itinerary-btn {
+        width: 100%;
+    }
+
+    .saved-trip-header {
+        flex-direction: column;
     }
 }
